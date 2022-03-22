@@ -398,9 +398,8 @@ class copy_on_write {
     struct payload {
         payload() = default;
 
-        template <typename... Args>
-        explicit payload(Args && ...args)
-            : value(std::forward<Args>(args)...)
+        explicit payload(const T& arg)
+            : value(arg)
         {}
 
         std::atomic<std::size_t> count{1};
@@ -415,9 +414,8 @@ public:
     {}
 
     template <typename U>
-    explicit copy_on_write(U && x, std::enable_if_t<!std::is_same<std::decay_t<U>,
-                           copy_on_write>::value>* = nullptr)
-        : m_data(new payload(std::forward<U>(x)))
+    explicit copy_on_write(const U& x)
+        : m_data(new payload(x))
     {}
 
     copy_on_write(const copy_on_write &x) noexcept
